@@ -4,33 +4,33 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/0.7.1/aframe.js"></script>
     <script src="https://unpkg.com/aframe-event-set-component@^4.0.0/dist/aframe-event-set-component.min.js"></script>
     <script src="js/components.js"></script>
-    <script src="js/index.js"></script>
   </head>
   <body>
-       <a-scene cursor="rayOrigin: mouse">
+      <a-scene cursor="rayOrigin: mouse">
          
-          <a-assets>
-              <a-mixin id="tile" 
-                  geometry="primitive: box; depth: 0.2; width: 1; height: 1" 
-                  material=""
-                  event-set__enter="_event: mouseenter;scale: 1 1 1.1;"
-                  event-set__leave="_event: mouseleave;scale: 1 1 1;">
-              </a-mixin>
-              <a-mixin id="black" material="color:black"></a-mixin>
-              <a-mixin id="white" material="color:white"></a-mixin>
-          </a-assets>
+        <a-assets>
+            <a-mixin id="tile" 
+                geometry="primitive: box; depth: 0.2; width: 1; height: 1" 
+                material=""
+                event-set__enter="_event: mouseenter;scale: 1 1 1.1;"
+                event-set__leave="_event: mouseleave;scale: 1 1 1;">
+            </a-mixin>
+            <a-mixin id="black" material="color:black"></a-mixin>
+            <a-mixin id="white" material="color:white"></a-mixin>
+        </a-assets>
 
-         <a-sky color="#4c5056"></a-sky>
-         <!-- Board container - all positions will be relative to the ones of the container so we can move the board around later -->
-         <a-plane board color="black" id="boardContainer" rotation="90 0 0" width="8" height="8" position="-4 0 -10">
-         <!-- tiles will be placed on the board by JS; each tile is an instance of the tile component -->
-         </a-plane>
+        <a-sky color="#4c5056"></a-sky>
+        <!-- Board container - all positions will be relative to the ones of the container so we can move the board around later -->
+        <a-plane board color="black" id="boardContainer" rotation="90 0 0" width="8" height="8" position="-4 0 -10">
+          <!-- tiles will be created and placed at the initialization of the board component -->
+        </a-plane>
 
          <!-- Oh and this is the viewer initial position -->
          <a-entity position="0 0.5 0">
-           <a-camera></a-camera>
+             <a-camera></a-camera>
          </a-entity>
       
-    </a-scene>    
+      </a-scene>
+      <a href="https://github.com/macmorning/aframe-chess"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
   </body>
 </html>
