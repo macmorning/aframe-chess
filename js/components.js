@@ -4,9 +4,11 @@ AFRAME.registerComponent("board", {
         chessBoardRows: {type: "array", default: [8, 7, 6, 5, 4, 3, 2, 1]}
     },
     init: function () {
+        // start by removing all child nodes; seems that this is the fastest way
         while (this.el.lastChild) {
             this.el.removeChild(this.el.lastChild);
         }
+        // add the tiles
         this._drawBoard();
     },
     _drawBoard: function () {
@@ -17,7 +19,7 @@ AFRAME.registerComponent("board", {
                 let color = (rowIndex % 2 === colIndex % 2 ? "white" : "black");
                 // create the new element in the dom
                 let el = document.createElement("a-entity");
-                // set the id of the new element : "a1", "c7"
+                // set the id of the new element : "a1", "c7", ...
                 el.id = col + row;
                 // use the mixins : [white|black] tile
                 el.setAttribute("mixin", color + " tile");
