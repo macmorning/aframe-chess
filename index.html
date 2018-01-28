@@ -45,20 +45,8 @@
         <a-sky color="#4c5056"></a-sky>
         <!-- Board container - all positions will be relative to the ones of the container so we can move the board around later -->
         <a-plane board color="black" id="boardContainer" rotation="90 0 0" width="8" height="8" position="-4 0 -10">
-          <!-- tiles will be created and placed at the initialization of the board component -->
+          <!-- tiles & pieces will be created and placed at the initialization of the board component -->
         </a-plane>
-        <a-entity mixin="smallPiece blackpawn" position="-2 0.2 -9"></a-entity>
-        <a-entity mixin="smallPiece whitepawn" position="-1 0.2 -9"></a-entity>
-        <a-entity mixin="medPiece blackbishop" position="-2 0.2 -7"></a-entity>
-        <a-entity mixin="medPiece whitebishop" position="-1 0.2 -7"></a-entity>
-        <a-entity mixin="bigPiece blackqueen" position="-2 0.2 -5"></a-entity>
-        <a-entity mixin="bigPiece whitequeen" position="-1 0.2 -5"></a-entity>
-        <a-entity mixin="bigPiece blackking" position="1 0.2 -5"></a-entity>
-        <a-entity mixin="bigPiece whiteking" position="2 0.2 -5"></a-entity>
-        <a-entity mixin="medPiece blackknight" position="1 0.2 -7"></a-entity>
-        <a-entity mixin="medPiece whiteknight" position="2 0.2 -7"></a-entity>
-        <a-entity mixin="medPiece blacktower" position="1 0.2 -9"></a-entity>
-        <a-entity mixin="medPiece whitetower" position="2 0.2 -9"></a-entity>
         <!-- Oh and this is the viewer initial position -->
          <a-entity position="0 0.5 0">
              <a-camera></a-camera>
