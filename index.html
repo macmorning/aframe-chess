@@ -6,7 +6,7 @@
     <script src="js/components.js"></script>
   </head>
   <body>
-      <a-scene cursor="rayOrigin: mouse">
+      <a-scene cursor="rayOrigin: mouse" ight="defaultLightsEnabled: false">
          
         <a-assets>
             <a-mixin id="tile" 
@@ -25,24 +25,23 @@
             <a-asset-item id="queenObj" src="assets/queen.obj"></a-asset-item>
             <a-asset-item id="whiteMtl" src="assets/white.mtl"></a-asset-item>
             <a-asset-item id="blackMtl" src="assets/black.mtl"></a-asset-item>
-            <a-mixin id="smallPiece" scale="0.05 0.05 0.05"></a-mixin>
-            <a-mixin id="medPiece" scale="0.06 0.06 0.06"></a-mixin>
-            <a-mixin id="bigPiece" scale="0.07 0.07 0.07"></a-mixin>
+            <a-mixin id="piece" scale="0.05 0.05 0.05" rotation="-90 0 0"></a-mixin>
             <a-mixin id="blackpawn" obj-model="obj: #pawnObj; mtl: #blackMtl"></a-mixin>
             <a-mixin id="blackknight" obj-model="obj: #knightObj; mtl: #blackMtl"></a-mixin>
             <a-mixin id="blacktower" obj-model="obj: #towerObj; mtl: #blackMtl"></a-mixin>
             <a-mixin id="blackbishop" obj-model="obj: #bishopObj; mtl: #blackMtl"></a-mixin>
             <a-mixin id="blackking" obj-model="obj: #kingObj; mtl: #blackMtl"></a-mixin>
             <a-mixin id="blackqueen" obj-model="obj: #queenObj; mtl: #blackMtl"></a-mixin>
-            <a-mixin id="whitepawn" obj-model="obj: #pawnObj; mtl: #whiteMtl" rotation="0 180 0"></a-mixin>
-            <a-mixin id="whiteknight" obj-model="obj: #knightObj; mtl: #whiteMtl" rotation="0 180 0"></a-mixin>
-            <a-mixin id="whitetower" obj-model="obj: #towerObj; mtl: #whiteMtl" rotation="0 180 0"></a-mixin>
-            <a-mixin id="whitebishop" obj-model="obj: #bishopObj; mtl: #whiteMtl" rotation="0 180 0"></a-mixin>
-            <a-mixin id="whiteking" obj-model="obj: #kingObj; mtl: #whiteMtl" rotation="0 180 0"></a-mixin>
-            <a-mixin id="whitequeen" obj-model="obj: #queenObj; mtl: #whiteMtl" rotation="0 180 0"></a-mixin>
+            <a-mixin id="whitepawn" obj-model="obj: #pawnObj; mtl: #whiteMtl"></a-mixin>
+            <a-mixin id="whiteknight" obj-model="obj: #knightObj; mtl: #whiteMtl"></a-mixin>
+            <a-mixin id="whitetower" obj-model="obj: #towerObj; mtl: #whiteMtl"></a-mixin>
+            <a-mixin id="whitebishop" obj-model="obj: #bishopObj; mtl: #whiteMtl"></a-mixin>
+            <a-mixin id="whiteking" obj-model="obj: #kingObj; mtl: #whiteMtl"></a-mixin>
+            <a-mixin id="whitequeen" obj-model="obj: #queenObj; mtl: #whiteMtl"></a-mixin>
         </a-assets>
 
         <a-sky color="#4c5056"></a-sky>
+        <a-entity light="type: point; color: white; intensity: 1" position="-4 7 -10"></a-entity> 
         <!-- Board container - all positions will be relative to the ones of the container so we can move the board around later -->
         <a-plane board color="black" id="boardContainer" rotation="90 0 0" width="8" height="8" position="-4 0 -10">
           <!-- tiles & pieces will be created and placed at the initialization of the board component -->

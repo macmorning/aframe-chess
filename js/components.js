@@ -66,19 +66,20 @@ AFRAME.registerComponent("board", {
         });
     },
     _createPiece: function (color, type, position) {
-        console.log(">> _createPiece > " + position + " > " + color + " " + type);
-        /* <a-entity mixin="smallPiece blackpawn" position="-2 0.2 -9"></a-entity>
-        <a-entity mixin="smallPiece whitepawn" position="-1 0.2 -9"></a-entity>
-        <a-entity mixin="medPiece blackbishop" position="-2 0.2 -7"></a-entity>
-        <a-entity mixin="medPiece whitebishop" position="-1 0.2 -7"></a-entity>
-        <a-entity mixin="bigPiece blackqueen" position="-2 0.2 -5"></a-entity>
-        <a-entity mixin="bigPiece whitequeen" position="-1 0.2 -5"></a-entity>
-        <a-entity mixin="bigPiece blackking" position="1 0.2 -5"></a-entity>
-        <a-entity mixin="bigPiece whiteking" position="2 0.2 -5"></a-entity>
-        <a-entity mixin="medPiece blackknight" position="1 0.2 -7"></a-entity>
-        <a-entity mixin="medPiece whiteknight" position="2 0.2 -7"></a-entity>
-        <a-entity mixin="medPiece blacktower" position="1 0.2 -9"></a-entity>
-        <a-entity mixin="medPiece whitetower" position="2 0.2 -9"></a-entity> */
+        let el = document.createElement("a-entity");
+        // set the id of the new element : "a1", "c7", ...
+        el.id = color + type + position;
+        // use the mixins : [white|black][pawn|tower|knight|bishop|queen|king] piece
+        el.setAttribute("mixin", color + type + " piece");
+        // declare that the new element has the piece component
+        el.setAttribute("piece", "type:" + type + ";color:" + color + ";boardPosition:" + position);
+        // add the element to the board element
+        try {
+            let tile = document.querySelector("#" + position);
+            tile.appendChild(el);
+        } catch (e) {
+            console.log(">> _createPiece > Error during appendItem > " + el.id + " / " + position + " > " + e);
+        }
     }
 });
 
@@ -90,7 +91,6 @@ AFRAME.registerComponent("tile", {
         color: {type: "string", default: ""}
     },
     init: function () {
-        console.log("tile init > " + this.data.name + " / color > " + this.data.color);
     }
 });
 
@@ -104,6 +104,18 @@ AFRAME.registerComponent("piece", {
         color: {type: "string", default: ""}
     },
     init: function () {
-        console.log("piece init > " + this.data.color + " " + this.data.type + " / position > " + this.data.boardPosition);
+        console.log(">> piece init > " + this.data.color + " " + this.data.type + " / position > " + this.data.boardPosition);
+        // set the position of the piece
+        let position = this.el.getAttribute("position");
+        this.el.setAttribute("position", { "x": position.x, "y": position.y, "z": -0.1 });
+        // flip the piece if it's white
+        if (this.data.color === "white") {
+            let rotation = this.el.getAttribute("rotation");
+            console.log(rotation);
+            this.el.setAttribute("rotation", { "x": rotation.x, "y": rotation.y, "z": rotation.z });
+        }
+    },
+    updated: function (oldData) {
+        console.log(">> piece updated > " + oldData);
     }
 });
