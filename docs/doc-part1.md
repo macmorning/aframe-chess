@@ -5,12 +5,12 @@
 To start with a simple and comprehensive first milestone, the scene is only made of the board and a flat color sky. We'll see later on if I can add an environment.
 
 To make positionning easy, I create a basic plane that will serve as the "boardContainer". All other entities will be children of this plane, so that their positions will be expressed relatively and not absolutely. More informations on [aframe docs](https://aframe.io/docs/master/introduction/entity-component-system.html "entity-component-system"). Then we'll be free to move the board around the scene, flip it, scale it... The only drawback is that the plane is rotated along the x-axis, and so will the children entites. No matter, we'll just rotate them back.
-The boardContainer has a component named ... board ! I will define all the initialization logic inside. Later, I will probably add some physics constraints on it two.
+The boardContainer has a component named ... board ! I will define all the initialization logic inside. Later, I will probably add some physics constraints on it too.
 
 ## Tiles
 
-We could have a simple image texture to render the board tiles, but that wouldn't be of much help when it comes to placing and moving the pieces. Instead, I create 8x8 pizza boxes to embody the tiles.
-Each tile will be created from a blend of two ["mixins"](https://aframe.io/docs/master/core/mixins.html "mixins") that gives us: 
+We could have a simple image texture to render the board tiles, but that wouldn't help much when it comes to placing and moving the pieces. Instead, I create 8x8 pizza boxes to embody the tiles.
+Each tile is created from a blend of two ["mixins"](https://aframe.io/docs/master/core/mixins.html "mixins") that gives us: 
 * "white"/"black": the material (just a basic color for now)
 * "tile": the geometry (pizza box) and basic event handlers for mouse enter/mouse leave
 
