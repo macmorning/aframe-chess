@@ -23,7 +23,7 @@ AFRAME.registerComponent("board", {
                 // set the id of the new element : "a1", "c7", ...
                 el.id = col + row;
                 // use the mixins : [white|black] tile
-                el.setAttribute("mixin", color + " tile");
+                el.setAttribute("mixin", "tile");
                 // declare that the new element has the tile component
                 el.setAttribute("tile", "name:" + el.id + ";color:" + color);
                 // position is conveniently calculated based on the column and row index
@@ -67,8 +67,6 @@ AFRAME.registerComponent("board", {
     },
     _createPiece: function (color, type, position) {
         let el = document.createElement("a-entity");
-        // set the id of the new element : "a1", "c7", ...
-        el.id = color + type + position;
         // use the mixins : [white|black][pawn|tower|knight|bishop|queen|king] piece
         el.setAttribute("mixin", color + type + " piece");
         // declare that the new element has the piece component
@@ -91,6 +89,7 @@ AFRAME.registerComponent("tile", {
         color: {type: "string", default: ""}
     },
     init: function () {
+        this.el.setAttribute("material", "color: " + this.data.color);
     }
 });
 
@@ -104,16 +103,21 @@ AFRAME.registerComponent("piece", {
         color: {type: "string", default: ""}
     },
     init: function () {
-        console.log(">> piece init > " + this.data.color + " " + this.data.type + " / position > " + this.data.boardPosition);
+        // set the id of the new element : "bpawnf", "wqueen", ...
+        this.el.id = this.data.color[0] + this.data.type + (this.data.type !== "queen" && this.data.type !== "king" ? this.data.boardPosition[0] : "");
+
         // set the position of the piece
         let position = this.el.getAttribute("position");
         this.el.setAttribute("position", { "x": position.x, "y": position.y, "z": -0.1 });
-        // flip the piece if it's white
-        if (this.data.color === "white") {
-            let rotation = this.el.getAttribute("rotation");
-            console.log(rotation);
-            this.el.setAttribute("rotation", { "x": rotation.x, "y": rotation.y, "z": rotation.z });
+
+        // if piece is white and not a symetric piece (pawn, tower), flip it
+        if (this.data.color === "white" && this.data.type !== "pawn" && this.data.type !== "tower") {
+            this.el.object3D.rotation.set(THREE.Math.degToRad(90), THREE.Math.degToRad(180), 0);
         }
+        var self = this;
+        this.el.addEventListener("click", function (evt) {
+            alert("clicked " + self.data.color + " " + self.data.type + " (" + self.data.boardPosition + ")" );
+        });
     },
     updated: function (oldData) {
         console.log(">> piece updated > " + oldData);

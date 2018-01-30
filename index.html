@@ -15,8 +15,7 @@
                 event-set__enter="_event: mouseenter;scale: 1 1 1.1;"
                 event-set__leave="_event: mouseleave;scale: 1 1 1;">
             </a-mixin>
-            <a-mixin id="black" material="color:black"></a-mixin>
-            <a-mixin id="white" material="color:white"></a-mixin>
+            <a-mixin id="piece" scale="0.05 0.05 0.05" rotation="-90 0 0"></a-mixin>
             <a-asset-item id="pawnObj" src="assets/pawn.obj"></a-asset-item>
             <a-asset-item id="knightObj" src="assets/knight.obj"></a-asset-item>
             <a-asset-item id="towerObj" src="assets/tower.obj"></a-asset-item>
@@ -25,7 +24,6 @@
             <a-asset-item id="queenObj" src="assets/queen.obj"></a-asset-item>
             <a-asset-item id="whiteMtl" src="assets/white.mtl"></a-asset-item>
             <a-asset-item id="blackMtl" src="assets/black.mtl"></a-asset-item>
-            <a-mixin id="piece" scale="0.05 0.05 0.05" rotation="-90 0 0"></a-mixin>
             <a-mixin id="blackpawn" obj-model="obj: #pawnObj; mtl: #blackMtl"></a-mixin>
             <a-mixin id="blackknight" obj-model="obj: #knightObj; mtl: #blackMtl"></a-mixin>
             <a-mixin id="blacktower" obj-model="obj: #towerObj; mtl: #blackMtl"></a-mixin>
@@ -41,7 +39,8 @@
         </a-assets>
 
         <a-sky color="#4c5056"></a-sky>
-        <a-entity light="type: point; color: white; intensity: 1" position="-4 7 -10"></a-entity> 
+        <a-entity light="type: point; color: white; intensity: 1" position="-4 7 -5"></a-entity> 
+        <a-entity light="type: ambient; color: white; intensity: 0.4"></a-entity> 
         <!-- Board container - all positions will be relative to the ones of the container so we can move the board around later -->
         <a-plane board color="black" id="boardContainer" rotation="90 0 0" width="8" height="8" position="-4 0 -10">
           <!-- tiles & pieces will be created and placed at the initialization of the board component -->
