@@ -90,6 +90,15 @@ AFRAME.registerComponent("tile", {
     },
     init: function () {
         this.el.setAttribute("material", "color: " + this.data.color);
+        var self = this;
+        this.el.addEventListener("click", function (evt) {
+            self.clicked(evt);
+        });
+    },
+    clicked: function (evt) {
+        if (this.el.firstChild) {
+            this.el.firstChild.components.piece.clicked(evt);
+        }
     }
 });
 
@@ -116,8 +125,13 @@ AFRAME.registerComponent("piece", {
         }
         var self = this;
         this.el.addEventListener("click", function (evt) {
-            alert("clicked " + self.data.color + " " + self.data.type + " (" + self.data.boardPosition + ")" );
+            self.clicked(evt);
         });
+    },
+    clicked: function (evt) {
+        evt.stopPropagation();
+        let position = this.el.getAttribute("position");
+        this.el.setAttribute("position", { "x": position.x, "y": position.y, "z": (position.z === -0.5 ? -0.1 : -0.5) });
     },
     updated: function (oldData) {
         console.log(">> piece updated > " + oldData);
