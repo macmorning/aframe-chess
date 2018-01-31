@@ -22,8 +22,6 @@ AFRAME.registerComponent("board", {
                 let el = document.createElement("a-entity");
                 // set the id of the new element : "a1", "c7", ...
                 el.id = col + row;
-                // use the mixins : [white|black] tile
-                el.setAttribute("mixin", "tile");
                 // declare that the new element has the tile component
                 el.setAttribute("tile", "name:" + el.id + ";color:" + color);
                 // position is conveniently calculated based on the column and row index
@@ -67,8 +65,6 @@ AFRAME.registerComponent("board", {
     },
     _createPiece: function (color, type, position) {
         let el = document.createElement("a-entity");
-        // use the mixins : [white|black][pawn|tower|knight|bishop|queen|king] piece
-        el.setAttribute("mixin", color + type + " piece");
         // declare that the new element has the piece component
         el.setAttribute("piece", "type:" + type + ";color:" + color + ";boardPosition:" + position);
         // add the element to the board element
@@ -89,6 +85,7 @@ AFRAME.registerComponent("tile", {
         color: {type: "string", default: ""}
     },
     init: function () {
+        this.el.setAttribute("mixin", "tile");
         this.el.setAttribute("material", "color: " + this.data.color);
         var self = this;
         this.el.addEventListener("click", function (evt) {
@@ -109,29 +106,47 @@ AFRAME.registerComponent("piece", {
         // boardPosition: current tile name the piece is on
         boardPosition: {type: "string", default: ""},
         // color: white|black
-        color: {type: "string", default: ""}
+        color: {type: "string", default: ""},
+        // up position: -0.5
+        upPosition: {type: "number", default: -0.5},
+        // down position: -0.1
+        downPosition: {type: "number", default: -0.1}
     },
     init: function () {
         // set the id of the new element : "bpawnf", "wqueen", ...
-        this.el.id = this.data.color[0] + this.data.type + (this.data.type !== "queen" && this.data.type !== "king" ? this.data.boardPosition[0] : "");
+        if (!this.el.id) {
+            this.el.id = this.data.color[0] + this.data.type + (this.data.type !== "queen" && this.data.type !== "king" ? this.data.boardPosition[0] : "");
+        } else {
+            console.log("piece > init > item already has an id > " + this.el.id);
+        }
+
+        // use the mixins : [white|black][pawn|tower|knight|bishop|queen|king] piece
+        this.el.setAttribute("mixin", this.data.color + this.data.type + " piece pickedup-anim");
 
         // set the position of the piece
         let position = this.el.getAttribute("position");
-        this.el.setAttribute("position", { "x": position.x, "y": position.y, "z": -0.1 });
+        this.el.setAttribute("position", { "x": position.x, "y": position.y, "z": this.data.downPosition });
 
         // if piece is white and not a symetric piece (pawn, tower), flip it
         if (this.data.color === "white" && this.data.type !== "pawn" && this.data.type !== "tower") {
             this.el.object3D.rotation.set(THREE.Math.degToRad(90), THREE.Math.degToRad(180), 0);
         }
+
+        let animEl = document.createElement("a-entity");
+        animEl.setAttribute("mixin", "pickedup-anim");
+        this.el.appendChild(animEl);
+
         var self = this;
         this.el.addEventListener("click", function (evt) {
             self.clicked(evt);
         });
     },
     clicked: function (evt) {
+        console.log("clicked!");
         evt.stopPropagation();
-        let position = this.el.getAttribute("position");
-        this.el.setAttribute("position", { "x": position.x, "y": position.y, "z": (position.z === -0.5 ? -0.1 : -0.5) });
+        this.el.emit("pickedUp");
+        // let position = this.el.getAttribute("position");
+        // this.el.setAttribute("position", { "x": position.x, "y": position.y, "z": (position.z === this.data.upPosition ? -0.1 : -0.5) });
     },
     updated: function (oldData) {
         console.log(">> piece updated > " + oldData);
