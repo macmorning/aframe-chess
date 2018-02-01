@@ -110,11 +110,8 @@ AFRAME.registerComponent("piece", {
         // up position: -0.5
         upPosition: {type: "number", default: -0.5},
         // down position: -0.1
-        downPosition: {type: "number", default: -0.1},
-        // initial rotation
-        initRotationX: {type: "number", default: -90},
-        initRotationY: {type: "number", default: 0},
-        initRotationZ: {type: "number", default: 0},
+        downPosition: {type: "number", default: -0.1}
+        // initial rotation attributes will be added to the schema at updateSchema time
     },
     init: function () {
         // set the id of the new element : "bpawnf", "wqueen", ...
@@ -127,19 +124,14 @@ AFRAME.registerComponent("piece", {
         let position = this.el.getAttribute("position");
         this.el.setAttribute("position", { "x": position.x, "y": position.y, "z": this.data.downPosition });
 
-        // if piece is white and not a symetric piece (pawn, tower), flip it
-        if (this.data.color === "white" && this.data.type !== "pawn" && this.data.type !== "tower") {
-            this.data.initRotationZ = 0;
-            this.data.initRotationY = 0;
-        }
-        this.el.object3D.rotation.set(THREE.Math.degToRad(this.data.initRotationX), THREE.Math.degToRad(this.data.initRotationY), THREE.Math.degToRad(this.data.initRotationZ));
+        console.log(this.data);
+        this.el.setAttribute("rotation", this.data.initRotationX + " " + this.data.initRotationY + " " + this.data.initRotationZ);
 
         // create the animation entity
         let animEl = document.createElement("a-animation");
         animEl.setAttribute("mixin", "rotate-anim");
-        let rotation = this.el.getAttribute("rotation");
-        animEl.setAttribute("from", rotation.x + " " + rotation.y + " -10");
-        animEl.setAttribute("to", rotation.x + " " + rotation.y + " 10");
+        animEl.setAttribute("from", this.data.initRotationX + " " + this.data.initRotationY + " " + (this.data.initRotationZ - 5));
+        animEl.setAttribute("to", this.data.initRotationX + " " + this.data.initRotationY + " " + (this.data.initRotationZ + 5));
         this.el.appendChild(animEl);
 
         var self = this;
@@ -159,7 +151,20 @@ AFRAME.registerComponent("piece", {
             this.el.emit("pickedUp");
         }
     },
-    update: function (oldData) {
-        console.log(">> piece updated > " + oldData);
+    update: function () {
+        // console.log(">> piece updated > " + this.data.initRotationY);
+    },
+    updateSchema: function (data) {
+        let tempSchema = {};
+        tempSchema.initRotationY = {type: "number", default: 0};
+        // if piece is white and not a symetric piece (pawn, tower), flip it
+        if (data.color === "white" && data.type !== "pawn" && data.type !== "tower") {
+            tempSchema.initRotationX = {type: "number", default: 90};
+            tempSchema.initRotationZ = {type: "number", default: 180};
+        } else {
+            tempSchema.initRotationX = {type: "number", default: -90};
+            tempSchema.initRotationZ = {type: "number", default: 0};
+        }
+        this.extendSchema(tempSchema);
     }
 });
