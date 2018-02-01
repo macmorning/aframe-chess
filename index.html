@@ -11,9 +11,9 @@
         <a-assets>
             <a-mixin id="tile" 
                 geometry="primitive: box; depth: 0.2; width: 1; height: 1" 
-                material=""
-                event-set__enter="_event: mouseenter;scale: 1 1 1.1;"
-                event-set__leave="_event: mouseleave;scale: 1 1 1;">
+                material="">
+                <!-- event-set__enter="_event: mouseenter;scale: 1 1 1.1;"
+                event-set__leave="_event: mouseleave;scale: 1 1 1;" -->
             </a-mixin>
 
             <a-mixin id="piece" scale="0.05 0.05 0.05" rotation="-90 0 0"></a-mixin>
@@ -40,10 +40,13 @@
             <a-mixin id="whitequeen" obj-model="obj: #queenObj; mtl: #whiteMtl"></a-mixin>
             <a-mixin id="pickedup-anim" attribute="position"
                 begin="pickedUp"
-                dur="1000"
-                fill="forwards"
-                to="0 1 -5"
-                from="0 0.2 -5"
+                end="dropped"
+                dur="500"
+                repeat="0"></a-mixin>
+            <a-mixin id="rotate-anim" attribute="rotation"
+                begin="pickedUp"
+                end="dropped"
+                dur="500"
                 repeat="indefinite"
                 direction="alternate"></a-mixin>
         </a-assets>
@@ -55,9 +58,7 @@
         <a-plane board color="black" id="boardContainer" rotation="90 0 0" width="8" height="8" position="-4 0 -10">
           <!-- tiles & pieces will be created and placed at the initialization of the board component -->
         </a-plane>
-        <a-entity mixin="piece whitequeen" piece="type:queen;color:white;boardPosition:e4;" id="test">
-            <a-animation mixin="pickedup-anim"></a-animation>
-        </a-entity>
+
        <!-- Oh and this is the viewer initial position -->
          <a-entity position="0 0.5 0">
              <a-camera></a-camera>

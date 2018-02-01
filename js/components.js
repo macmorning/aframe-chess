@@ -110,15 +110,15 @@ AFRAME.registerComponent("piece", {
         // up position: -0.5
         upPosition: {type: "number", default: -0.5},
         // down position: -0.1
-        downPosition: {type: "number", default: -0.1}
+        downPosition: {type: "number", default: -0.1},
+        // initial rotation
+        initRotationX: {type: "number", default: -90},
+        initRotationY: {type: "number", default: 0},
+        initRotationZ: {type: "number", default: 0},
     },
     init: function () {
         // set the id of the new element : "bpawnf", "wqueen", ...
-        if (!this.el.id) {
-            this.el.id = this.data.color[0] + this.data.type + (this.data.type !== "queen" && this.data.type !== "king" ? this.data.boardPosition[0] : "");
-        } else {
-            console.log("piece > init > item already has an id > " + this.el.id);
-        }
+        this.el.id = this.data.color[0] + this.data.type + (this.data.type !== "queen" && this.data.type !== "king" ? this.data.boardPosition[0] : "");
 
         // use the mixins : [white|black][pawn|tower|knight|bishop|queen|king] piece
         this.el.setAttribute("mixin", this.data.color + this.data.type + " piece pickedup-anim");
@@ -129,11 +129,17 @@ AFRAME.registerComponent("piece", {
 
         // if piece is white and not a symetric piece (pawn, tower), flip it
         if (this.data.color === "white" && this.data.type !== "pawn" && this.data.type !== "tower") {
-            this.el.object3D.rotation.set(THREE.Math.degToRad(90), THREE.Math.degToRad(180), 0);
+            this.data.initRotationZ = 0;
+            this.data.initRotationY = 0;
         }
+        this.el.object3D.rotation.set(THREE.Math.degToRad(this.data.initRotationX), THREE.Math.degToRad(this.data.initRotationY), THREE.Math.degToRad(this.data.initRotationZ));
 
-        let animEl = document.createElement("a-entity");
-        animEl.setAttribute("mixin", "pickedup-anim");
+        // create the animation entity
+        let animEl = document.createElement("a-animation");
+        animEl.setAttribute("mixin", "rotate-anim");
+        let rotation = this.el.getAttribute("rotation");
+        animEl.setAttribute("from", rotation.x + " " + rotation.y + " -10");
+        animEl.setAttribute("to", rotation.x + " " + rotation.y + " 10");
         this.el.appendChild(animEl);
 
         var self = this;
@@ -142,13 +148,18 @@ AFRAME.registerComponent("piece", {
         });
     },
     clicked: function (evt) {
-        console.log("clicked!");
         evt.stopPropagation();
-        this.el.emit("pickedUp");
-        // let position = this.el.getAttribute("position");
-        // this.el.setAttribute("position", { "x": position.x, "y": position.y, "z": (position.z === this.data.upPosition ? -0.1 : -0.5) });
+        let position = this.el.getAttribute("position");
+        if (position.z === this.data.upPosition) {
+            this.el.setAttribute("position", { "x": position.x, "y": position.y, "z": this.data.downPosition });
+            this.el.emit("dropped");
+            this.el.setAttribute("rotation", this.data.initRotationX + " " + this.data.initRotationY + " " + this.data.initRotationZ);
+        } else {
+            this.el.setAttribute("position", { "x": position.x, "y": position.y, "z": this.data.upPosition });
+            this.el.emit("pickedUp");
+        }
     },
-    updated: function (oldData) {
+    update: function (oldData) {
         console.log(">> piece updated > " + oldData);
     }
 });
