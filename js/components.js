@@ -158,6 +158,7 @@ AFRAME.registerComponent("piece", {
         let position = this.el.getAttribute("position");
         if (position.z < this.data.downPosition) {
             // restore original rotation
+            // warning: sometimes after animating the position, the entity is not exactly at the expected "to" position (-0.09999999998 instead of -0.1)
             this.el.setAttribute("rotation", this.data.initRotationX + " " + this.data.initRotationY + " " + this.data.initRotationZ);
             this.el.emit("dropped");
         } else {
@@ -171,7 +172,7 @@ AFRAME.registerComponent("piece", {
         let tempSchema = {};
         tempSchema.initRotationY = {type: "number", default: 0};
         // if piece is white and not a symetric piece (pawn, tower), flip it
-        if (data.color === "white" && data.type !== "pawn" && data.type !== "tower") {
+        if (data.color === "white") {
             tempSchema.initRotationX = {type: "number", default: 90};
             tempSchema.initRotationZ = {type: "number", default: 180};
         } else {

@@ -71,7 +71,68 @@ To access the inspector, use the ctrl+alt+i keys combo.
 
 ## Animating the pieces
 
-(coming soon)
+This part was a little harder for me to wrap my head around. Actually, I'm still not sure the way I did it was the right way. I'd love some feedback about it if you can.
+My first thought was that I would have many animations to create. For each piece:
+* picking up
+* dropping down
+* floating or such once the piece is up in the air
+* -will come later- moving from one tile to another
+
+That's 4 * 32 = 128 more entities. Is this a concern I should have? Is there a better way, using only the aframe animation component? That's probably another point I'll have to look again.
+So, the basic informations are set in a pair of mixins :
+* updown-anim: is used for picking up and dropping down
+```xml
+<a-mixin id="updown-anim" attribute="position"
+        dur="500"
+        direction="normal"
+        repeat="0"></a-mixin>
+```
+The "to" and "begin" attributes will be set when we attach the animation to the entity, depending on the movement.
+
+* rotate-anim: is used for the "float" effet
+```xml
+<a-mixin id="rotate-anim" attribute="rotation"
+        begin="pickedup"
+        end="dropped"
+        dur="500"
+        repeat="indefinite"
+        direction="alternate"></a-mixin>
+```
+
+At initialization time of the piece component, or rather on the updateSchema event, I'm setting the initial rotation Vec3D coordinates of each piece, depending on its color. This is used after the rotation animation, when the piece is dropped down. 
+
+The three animations entities are appended to the piece element :
+```javascript
+// create the animation entity
+let animEl = document.createElement("a-animation");
+animEl.setAttribute("mixin", "rotate-anim");
+animEl.setAttribute("from", this.data.initRotationX + " " + this.data.initRotationY + " " + (this.data.initRotationZ - 5));
+animEl.setAttribute("to", this.data.initRotationX + " " + this.data.initRotationY + " " + (this.data.initRotationZ + 5));
+this.el.appendChild(animEl);
+
+// create the picked up animation entity
+let animElUp = document.createElement("a-animation");
+animElUp.setAttribute("mixin", "updown-anim");
+animElUp.setAttribute("attribute", "position");
+animElUp.setAttribute("begin", "pickedup");
+animElUp.setAttribute("to", "0 0 " + this.data.upPosition);
+this.el.appendChild(animElUp);
+
+// create the dropped down animation entity
+let animElDown = document.createElement("a-animation");
+animElDown.setAttribute("mixin", "updown-anim");
+animElDown.setAttribute("attribute", "position");
+animElDown.setAttribute("begin", "dropped");
+animElDown.setAttribute("to", "0 0 " + this.data.downPosition);
+this.el.appendChild(animElDown);
+```
+
+Now I just have to emit the "pickedup" and "dropped" events to the clicked piece.
 
 [Checkout the code for this part on github](https://github.com/macmorning/aframe-chess/tree/92e04c1c24242d2bbf8e579865e183fd92c7511e).
 ![alt text](img/chessboard_pieces_animated.gif "Board preview")
+
+
+## What's next
+
+[In part 3](https://github.com/macmorning/aframe-chess/blob/master/docs/doc-part3.md), I -hopefully- implement piece movements.
