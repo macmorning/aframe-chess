@@ -120,11 +120,9 @@ AFRAME.registerComponent("piece", {
         // use the mixins : [white|black][pawn|tower|knight|bishop|queen|king] piece
         this.el.setAttribute("mixin", this.data.color + this.data.type + " piece pickedup-anim");
 
-        // set the position of the piece
+        // set the position and rotation of the piece
         let position = this.el.getAttribute("position");
         this.el.setAttribute("position", { "x": position.x, "y": position.y, "z": this.data.downPosition });
-
-        console.log(this.data);
         this.el.setAttribute("rotation", this.data.initRotationX + " " + this.data.initRotationY + " " + this.data.initRotationZ);
 
         // create the animation entity
@@ -134,6 +132,22 @@ AFRAME.registerComponent("piece", {
         animEl.setAttribute("to", this.data.initRotationX + " " + this.data.initRotationY + " " + (this.data.initRotationZ + 5));
         this.el.appendChild(animEl);
 
+        // create the picked up animation entity
+        let animElUp = document.createElement("a-animation");
+        animElUp.setAttribute("mixin", "updown-anim");
+        animElUp.setAttribute("attribute", "position");
+        animElUp.setAttribute("begin", "pickedup");
+        animElUp.setAttribute("to", "0 0 " + this.data.upPosition);
+        this.el.appendChild(animElUp);
+
+        // create the dropped down animation entity
+        let animElDown = document.createElement("a-animation");
+        animElDown.setAttribute("mixin", "updown-anim");
+        animElDown.setAttribute("attribute", "position");
+        animElDown.setAttribute("begin", "dropped");
+        animElDown.setAttribute("to", "0 0 " + this.data.downPosition);
+        this.el.appendChild(animElDown);
+
         var self = this;
         this.el.addEventListener("click", function (evt) {
             self.clicked(evt);
@@ -142,13 +156,12 @@ AFRAME.registerComponent("piece", {
     clicked: function (evt) {
         evt.stopPropagation();
         let position = this.el.getAttribute("position");
-        if (position.z === this.data.upPosition) {
-            this.el.setAttribute("position", { "x": position.x, "y": position.y, "z": this.data.downPosition });
-            this.el.emit("dropped");
+        if (position.z < this.data.downPosition) {
+            // restore original rotation
             this.el.setAttribute("rotation", this.data.initRotationX + " " + this.data.initRotationY + " " + this.data.initRotationZ);
+            this.el.emit("dropped");
         } else {
-            this.el.setAttribute("position", { "x": position.x, "y": position.y, "z": this.data.upPosition });
-            this.el.emit("pickedUp");
+            this.el.emit("pickedup");
         }
     },
     update: function () {
