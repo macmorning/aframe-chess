@@ -78,58 +78,30 @@ My first thought was that I would have many animations to create. For each piece
 * floating or such once the piece is up in the air
 * -will come later- moving from one tile to another
 
-That's 4 * 32 = 128 more entities. Is this a concern I should have? Is there a better way, using only the aframe animation component? That's probably another point I'll have to look again.
-So, the basic informations are set in a pair of mixins :
-* updown-anim: is used for picking up and dropping down
-```xml
-<a-mixin id="updown-anim" attribute="position"
-        dur="500"
-        direction="normal"
-        repeat="0"></a-mixin>
-```
-The "to" and "begin" attributes will be set when we attach the animation to the entity, depending on the movement.
+--That's 4 * 32 = 128 more entities. Is this a concern I should have? Is there a better way, using only the standard aframe animation component? That's probably another point I'll have to look again.-- The answer was: switch to [aframe-animation-component](https://www.npmjs.com/package/aframe-animation-component). The current animation component is thought to be deprecated is a future release, replaced by this component. It defines animations as attributes of the entities rather than new entites.
 
-* rotate-anim: is used for the "float" effet
-```xml
-<a-mixin id="rotate-anim" attribute="rotation"
-        begin="pickedup"
-        end="dropped"
-        dur="500"
-        repeat="indefinite"
-        direction="alternate"></a-mixin>
-```
-
-At initialization time of the piece component, or rather on the updateSchema event, I'm setting the initial rotation Vec3D coordinates of each piece, depending on its color. This is used after the rotation animation, when the piece is dropped down. 
-
-The three animations entities are appended to the piece element :
 ```javascript
-// create the animation entity
-let animEl = document.createElement("a-animation");
-animEl.setAttribute("mixin", "rotate-anim");
-animEl.setAttribute("from", this.data.initRotationX + " " + this.data.initRotationY + " " + (this.data.initRotationZ - 5));
-animEl.setAttribute("to", this.data.initRotationX + " " + this.data.initRotationY + " " + (this.data.initRotationZ + 5));
-this.el.appendChild(animEl);
+// picked up animation
+let from = position.x + " " + position.y + " " + position.z;
+let to = position.x + " " + position.y + " " + this.data.upPosition;
+let animationPickedup = "property: position; startEvents: pickedup; dir: alternate; dur: 500;easing: easeInSine; from:" + from + "; to:" + to;
+this.el.setAttribute("animation__pickedup", animationPickedup);
 
-// create the picked up animation entity
-let animElUp = document.createElement("a-animation");
-animElUp.setAttribute("mixin", "updown-anim");
-animElUp.setAttribute("attribute", "position");
-animElUp.setAttribute("begin", "pickedup");
-animElUp.setAttribute("to", "0 0 " + this.data.upPosition);
-this.el.appendChild(animElUp);
+// floating animation
+let floatfrom = position.x + " " + position.y + " " + this.data.upPosition;
+let floatto = position.x + " " + position.y + " " + (this.data.upPosition + 0.1);
+let animationFloating = "property: position; startEvents: pickedup; pauseEvents: dropped; dir: alternate; delay: 500;dur: 1000;easing: easeInSine; loop: true; from:" + floatfrom + "; to:" + floatto;
+this.el.setAttribute("animation__floating", animationFloating);
 
-// create the dropped down animation entity
-let animElDown = document.createElement("a-animation");
-animElDown.setAttribute("mixin", "updown-anim");
-animElDown.setAttribute("attribute", "position");
-animElDown.setAttribute("begin", "dropped");
-animElDown.setAttribute("to", "0 0 " + this.data.downPosition);
-this.el.appendChild(animElDown);
+// dropped animation
+let animationDropped = "property: position; startEvents: dropped; dir: alternate; dur: 500;easing: easeInSine; from:" + to + "; to:" + from;
+this.el.setAttribute("animation__dropped", animationDropped);
 ```
 
 Now I just have to emit the "pickedup" and "dropped" events to the clicked piece.
 
-[Checkout the code for this part on github](https://github.com/macmorning/aframe-chess/tree/92e04c1c24242d2bbf8e579865e183fd92c7511e).
+[Checkout the code for this part on github](https://github.com/macmorning/aframe-chess/tree/3bb954d7183cc5fff6cf5f7fb99940bf945eeb1d).
+[Or click here for the old animation component code](https://github.com/macmorning/aframe-chess/tree/92e04c1c24242d2bbf8e579865e183fd92c7511e).
 ![alt text](img/chessboard_pieces_animated.gif "Board preview")
 
 
