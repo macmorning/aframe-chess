@@ -1,3 +1,7 @@
+const currState = {
+    pickedup: {}
+};
+
 AFRAME.registerComponent("board", {
     schema: {
         chessBoardColumns: {type: "array", default: ["a", "b", "c", "d", "e", "f", "g", "h"]},
@@ -93,6 +97,16 @@ AFRAME.registerComponent("tile", {
         });
     },
     clicked: function (evt) {
+        // https://stackoverflow.com/questions/44345423/how-do-i-preserve-an-entity-when-changing-its-parent-in-the-dom
+        /*
+        if (currState.pickedup.id !== undefined) {
+            let newEl = currState.pickedup.cloneNode();
+            this.el.appendChild(newEl);
+
+            // this.el.firstChild.components.piece.clicked(evt);
+        } else
+        */
+        console.log("tile " + this.el.id + " clicked");
         if (this.el.firstChild) {
             this.el.firstChild.components.piece.clicked(evt);
         }
@@ -125,28 +139,24 @@ AFRAME.registerComponent("piece", {
         this.el.setAttribute("position", { "x": position.x, "y": position.y, "z": this.data.downPosition });
         this.el.setAttribute("rotation", this.data.initRotationX + " " + this.data.initRotationY + " " + this.data.initRotationZ);
 
-        // create the animation entity
-        let animEl = document.createElement("a-animation");
-        animEl.setAttribute("mixin", "rotate-anim");
-        animEl.setAttribute("from", this.data.initRotationX + " " + this.data.initRotationY + " " + (this.data.initRotationZ - 5));
-        animEl.setAttribute("to", this.data.initRotationX + " " + this.data.initRotationY + " " + (this.data.initRotationZ + 5));
-        this.el.appendChild(animEl);
+        /******************************
+         *  Setting up animations
+        *******************************/
+        // picked up animation
+        let from = position.x + " " + position.y + " " + position.z;
+        let to = position.x + " " + position.y + " " + this.data.upPosition;
+        let animationPickedup = "property: position; startEvents: pickedup; dir: alternate; dur: 500;easing: easeInSine; from:" + from + "; to:" + to;
+        this.el.setAttribute("animation__pickedup", animationPickedup);
 
-        // create the picked up animation entity
-        let animElUp = document.createElement("a-animation");
-        animElUp.setAttribute("mixin", "updown-anim");
-        animElUp.setAttribute("attribute", "position");
-        animElUp.setAttribute("begin", "pickedup");
-        animElUp.setAttribute("to", "0 0 " + this.data.upPosition);
-        this.el.appendChild(animElUp);
+        // floating animation
+        let floatfrom = position.x + " " + position.y + " " + this.data.upPosition;
+        let floatto = position.x + " " + position.y + " " + (this.data.upPosition + 0.1);
+        let animationFloating = "property: position; startEvents: pickedup; pauseEvents: dropped; dir: alternate; delay: 500;dur: 1000;easing: easeInSine; loop: true; from:" + floatfrom + "; to:" + floatto;
+        this.el.setAttribute("animation__floating", animationFloating);
 
-        // create the dropped down animation entity
-        let animElDown = document.createElement("a-animation");
-        animElDown.setAttribute("mixin", "updown-anim");
-        animElDown.setAttribute("attribute", "position");
-        animElDown.setAttribute("begin", "dropped");
-        animElDown.setAttribute("to", "0 0 " + this.data.downPosition);
-        this.el.appendChild(animElDown);
+        // dropped animation
+        let animationDropped = "property: position; startEvents: dropped; dir: alternate; dur: 500;easing: easeInSine; from:" + to + "; to:" + from;
+        this.el.setAttribute("animation__dropped", animationDropped);
 
         var self = this;
         this.el.addEventListener("click", function (evt) {
@@ -154,15 +164,16 @@ AFRAME.registerComponent("piece", {
         });
     },
     clicked: function (evt) {
-        evt.stopPropagation();
+        console.log("piece " + this.el.id + " clicked");
         let position = this.el.getAttribute("position");
         if (position.z < this.data.downPosition) {
-            // restore original rotation
             // warning: sometimes after animating the position, the entity is not exactly at the expected "to" position (-0.09999999998 instead of -0.1)
-            this.el.setAttribute("rotation", this.data.initRotationX + " " + this.data.initRotationY + " " + this.data.initRotationZ);
             this.el.emit("dropped");
+            currState.pickedup = {};
         } else {
+            // start the pickedup animation
             this.el.emit("pickedup");
+            currState.pickedup = this.el;
         }
     },
     update: function () {
@@ -171,7 +182,7 @@ AFRAME.registerComponent("piece", {
     updateSchema: function (data) {
         let tempSchema = {};
         tempSchema.initRotationY = {type: "number", default: 0};
-        // if piece is white and not a symetric piece (pawn, tower), flip it
+        // if piece is white then flip it
         if (data.color === "white") {
             tempSchema.initRotationX = {type: "number", default: 90};
             tempSchema.initRotationZ = {type: "number", default: 180};
