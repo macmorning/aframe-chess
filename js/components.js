@@ -98,16 +98,13 @@ AFRAME.registerComponent("tile", {
     },
     clicked: function (evt) {
         // https://stackoverflow.com/questions/44345423/how-do-i-preserve-an-entity-when-changing-its-parent-in-the-dom
-        /*
         if (currState.pickedup.id !== undefined) {
-            let newEl = currState.pickedup.cloneNode();
-            this.el.appendChild(newEl);
-
-            // this.el.firstChild.components.piece.clicked(evt);
-        } else
-        */
-        console.log("tile " + this.el.id + " clicked");
-        if (this.el.firstChild) {
+            var entity = currState.pickedup;
+            entity.flushToDOM(true);
+            let copy = entity.cloneNode();
+            this.el.appendChild(copy);
+            entity.parentNode.removeChild(entity);
+        } else if (this.el.firstChild) {
             this.el.firstChild.components.piece.clicked(evt);
         }
     }
@@ -164,6 +161,7 @@ AFRAME.registerComponent("piece", {
         });
     },
     clicked: function (evt) {
+        evt.stopPropagation();
         console.log("piece " + this.el.id + " clicked");
         let position = this.el.getAttribute("position");
         if (position.z < this.data.downPosition) {
