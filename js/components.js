@@ -97,7 +97,7 @@ AFRAME.registerComponent("tile", {
         });
     },
     clicked: function (evt) {
-        // https://stackoverflow.com/questions/44345423/how-do-i-preserve-an-entity-when-changing-its-parent-in-the-dom
+        // https://github.com/aframevr/aframe/issues/2425
         if (currState.pickedup.id !== undefined) {
             var entity = currState.pickedup;
             entity.flushToDOM(true);
