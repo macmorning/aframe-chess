@@ -97,14 +97,28 @@ AFRAME.registerComponent("tile", {
         });
     },
     clicked: function (evt) {
-        // https://github.com/aframevr/aframe/issues/2425
+        if (this.el.firstChild && currState.pickedup.id !== undefined) {
+            // a piece was picked up but there is a piece on the target tile
+            if(this.el.firstChild.components.piece.data.color == currState.pickedup.components.piece.data.color) {
+                // the piece on the target tile has the same color as the one that was picked up
+                return false;
+            } else {
+                // remove the other color piece
+                this.el.removeChild(this.el.firstChild);
+            }
+        } 
         if (currState.pickedup.id !== undefined) {
+            // then, move the picked up piece to the tile
+            // check this thread on reparenting: https://github.com/aframevr/aframe/issues/2425
             var entity = currState.pickedup;
             entity.flushToDOM(true);
             let copy = entity.cloneNode();
             this.el.appendChild(copy);
             entity.parentNode.removeChild(entity);
+            currState.pickedup = {};
+            copy.emit("dropped");
         } else if (this.el.firstChild) {
+            // if a piece is on the tile, then propagate the clicked event
             this.el.firstChild.components.piece.clicked(evt);
         }
     }
@@ -122,7 +136,6 @@ AFRAME.registerComponent("piece", {
         upPosition: {type: "number", default: -0.5},
         // down position: -0.1
         downPosition: {type: "number", default: -0.1}
-        // initial rotation attributes will be added to the schema at updateSchema time
     },
     init: function () {
         // set the id of the new element : "bpawnf", "wqueen", ...
@@ -139,20 +152,20 @@ AFRAME.registerComponent("piece", {
         /******************************
          *  Setting up animations
         *******************************/
-        // picked up animation
-        let from = position.x + " " + position.y + " " + position.z;
-        let to = position.x + " " + position.y + " " + this.data.upPosition;
-        let animationPickedup = "property: position; startEvents: pickedup; dir: alternate; dur: 500;easing: easeInSine; from:" + from + "; to:" + to;
-        this.el.setAttribute("animation__pickedup", animationPickedup);
-
         // floating animation
         let floatfrom = position.x + " " + position.y + " " + this.data.upPosition;
         let floatto = position.x + " " + position.y + " " + (this.data.upPosition + 0.1);
         let animationFloating = "property: position; startEvents: pickedup; pauseEvents: dropped; dir: alternate; delay: 500;dur: 1000;easing: easeInSine; loop: true; from:" + floatfrom + "; to:" + floatto;
         this.el.setAttribute("animation__floating", animationFloating);
 
+        // picked up animation
+        let from = position.x + " " + position.y + " " + position.z;
+        let to = position.x + " " + position.y + " " + this.data.upPosition;
+        let animationPickedup = "property: position; startEvents: pickedup; dur: 500;easing: easeInSine; from:" + from + "; to:" + to;
+        this.el.setAttribute("animation__pickedup", animationPickedup);
+
         // dropped animation
-        let animationDropped = "property: position; startEvents: dropped; dir: alternate; dur: 500;easing: easeInSine; from:" + to + "; to:" + from;
+        let animationDropped = "property: position; startEvents: dropped; dur: 500;easing: easeInSine; from:" + to + "; to:" + from;
         this.el.setAttribute("animation__dropped", animationDropped);
 
         var self = this;
@@ -163,19 +176,22 @@ AFRAME.registerComponent("piece", {
     clicked: function (evt) {
         evt.stopPropagation();
         console.log("piece " + this.el.id + " clicked");
-        let position = this.el.getAttribute("position");
-        if (position.z < this.data.downPosition) {
-            // warning: sometimes after animating the position, the entity is not exactly at the expected "to" position (-0.09999999998 instead of -0.1)
-            this.el.emit("dropped");
-            currState.pickedup = {};
+        if(currState.pickedup.id !== undefined) {
+            // propagate the click to the parent tile
+            this.el.parentEl.emit("click");
         } else {
-            // start the pickedup animation
-            this.el.emit("pickedup");
-            currState.pickedup = this.el;
+            let position = this.el.getAttribute("position");
+            if (position.z < this.data.downPosition) {
+                // warning: sometimes after animating the position, the entity is not exactly at the expected "to" position (-0.09999999998 instead of -0.1)
+                this.el.emit("dropped");
+            } else {
+                // start the pickedup animation
+                this.el.emit("pickedup");
+                currState.pickedup = this.el;
+            }
         }
     },
     update: function () {
-        // console.log(">> piece updated > " + this.data.initRotationY);
     },
     updateSchema: function (data) {
         let tempSchema = {};
