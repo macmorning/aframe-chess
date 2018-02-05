@@ -5,6 +5,7 @@
     <script src="https://unpkg.com/aframe-animation-component@4.0.0-beta8/dist/aframe-animation-component.min.js"></script>
     <script src="https://unpkg.com/aframe-event-set-component@^4.0.0/dist/aframe-event-set-component.min.js"></script>
     <script src="js/components.js"></script>
+    <script src="js/chessboard.js"></script>
   </head>
   <body>
       <a-scene stats light="defaultLightsEnabled: false">
@@ -21,7 +22,7 @@
 
             <a-asset-item id="pawnObj" src="assets/pawn.obj"></a-asset-item>
             <a-asset-item id="knightObj" src="assets/knight.obj"></a-asset-item>
-            <a-asset-item id="towerObj" src="assets/tower.obj"></a-asset-item>
+            <a-asset-item id="rookObj" src="assets/rook.obj"></a-asset-item>
             <a-asset-item id="bishopObj" src="assets/bishop.obj"></a-asset-item>
             <a-asset-item id="kingObj" src="assets/king.obj"></a-asset-item>
             <a-asset-item id="queenObj" src="assets/queen.obj"></a-asset-item>
@@ -29,13 +30,13 @@
             <a-asset-item id="blackMtl" src="assets/black.mtl"></a-asset-item>
             <a-mixin id="blackpawn" obj-model="obj: #pawnObj; mtl: #blackMtl"></a-mixin>
             <a-mixin id="blackknight" obj-model="obj: #knightObj; mtl: #blackMtl"></a-mixin>
-            <a-mixin id="blacktower" obj-model="obj: #towerObj; mtl: #blackMtl"></a-mixin>
+            <a-mixin id="blackrook" obj-model="obj: #rookObj; mtl: #blackMtl"></a-mixin>
             <a-mixin id="blackbishop" obj-model="obj: #bishopObj; mtl: #blackMtl"></a-mixin>
             <a-mixin id="blackking" obj-model="obj: #kingObj; mtl: #blackMtl"></a-mixin>
             <a-mixin id="blackqueen" obj-model="obj: #queenObj; mtl: #blackMtl"></a-mixin>
             <a-mixin id="whitepawn" obj-model="obj: #pawnObj; mtl: #whiteMtl"></a-mixin>
             <a-mixin id="whiteknight" obj-model="obj: #knightObj; mtl: #whiteMtl"></a-mixin>
-            <a-mixin id="whitetower" obj-model="obj: #towerObj; mtl: #whiteMtl"></a-mixin>
+            <a-mixin id="whiterook" obj-model="obj: #rookObj; mtl: #whiteMtl"></a-mixin>
             <a-mixin id="whitebishop" obj-model="obj: #bishopObj; mtl: #whiteMtl"></a-mixin>
             <a-mixin id="whiteking" obj-model="obj: #kingObj; mtl: #whiteMtl"></a-mixin>
             <a-mixin id="whitequeen" obj-model="obj: #queenObj; mtl: #whiteMtl"></a-mixin>

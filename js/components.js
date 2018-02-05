@@ -15,6 +15,8 @@ AFRAME.registerComponent("board", {
         // add the tiles
         this._drawBoard();
         this._createPieces();
+        // initialize the CHESSBOARD object
+        CHESSBOARD.initChessBoard();
     },
     _drawBoard: function () {
         let self = this;
@@ -24,8 +26,8 @@ AFRAME.registerComponent("board", {
                 let color = (rowIndex % 2 === colIndex % 2 ? "white" : "black");
                 // create the new element in the dom
                 let el = document.createElement("a-entity");
-                // set the id of the new element : "a1", "c7", ...
-                el.id = col + row;
+                // set the id of the new element : "sqa1", "sqc7", ...
+                el.id = "sq" + col + row;
                 // declare that the new element has the tile component
                 el.setAttribute("tile", "name:" + el.id + ";color:" + color);
                 // position is conveniently calculated based on the column and row index
@@ -46,7 +48,7 @@ AFRAME.registerComponent("board", {
                     switch (col) {
                     case "a":
                     case "h":
-                        self._createPiece(color, "tower", col + row);
+                        self._createPiece(color, "rook", col + row);
                         break;
                     case "b":
                     case "g":
@@ -73,7 +75,7 @@ AFRAME.registerComponent("board", {
         el.setAttribute("piece", "type:" + type + ";color:" + color + ";boardPosition:" + position);
         // add the element to the board element
         try {
-            let tile = document.querySelector("#" + position);
+            let tile = document.querySelector("#sq" + position);
             tile.appendChild(el);
         } catch (e) {
             console.log(">> _createPiece > Error during appendItem > " + el.id + " / " + position + " > " + e);
@@ -99,15 +101,15 @@ AFRAME.registerComponent("tile", {
     clicked: function (evt) {
         if (this.el.firstChild && currState.pickedup.id !== undefined) {
             // a piece was picked up but there is a piece on the target tile
-            if(this.el.firstChild.components.piece.data.color == currState.pickedup.components.piece.data.color) {
+            if (this.el.firstChild.components.piece.data.color === currState.pickedup.components.piece.data.color) {
                 // the piece on the target tile has the same color as the one that was picked up
                 return false;
             } else {
                 // remove the other color piece
                 this.el.removeChild(this.el.firstChild);
             }
-        } 
-        if (currState.pickedup.id !== undefined) {
+        }
+        if (currState.pickedup.id !== undefined && CHESSBOARD._canMove(currState.pickedup.id, this.el.id)) {
             // then, move the picked up piece to the tile
             // check this thread on reparenting: https://github.com/aframevr/aframe/issues/2425
             var entity = currState.pickedup;
@@ -117,6 +119,8 @@ AFRAME.registerComponent("tile", {
             entity.parentNode.removeChild(entity);
             currState.pickedup = {};
             copy.emit("dropped");
+        } else if (currState.pickedup.id !== undefined) {
+            console.log(currState.pickedup.id + " cannot move to " + this.el.id);
         } else if (this.el.firstChild) {
             // if a piece is on the tile, then propagate the clicked event
             this.el.firstChild.components.piece.clicked(evt);
@@ -126,7 +130,7 @@ AFRAME.registerComponent("tile", {
 
 AFRAME.registerComponent("piece", {
     schema: {
-        // type: pawn / tower / bishop / knight / queen / king
+        // type: pawn / rook / bishop / knight / queen / king
         type: {type: "string", default: ""},
         // boardPosition: current tile name the piece is on
         boardPosition: {type: "string", default: ""},
@@ -141,7 +145,7 @@ AFRAME.registerComponent("piece", {
         // set the id of the new element : "bpawnf", "wqueen", ...
         this.el.id = this.data.color[0] + this.data.type + (this.data.type !== "queen" && this.data.type !== "king" ? this.data.boardPosition[0] : "");
 
-        // use the mixins : [white|black][pawn|tower|knight|bishop|queen|king] piece
+        // use the mixins : [white|black][pawn|rook|knight|bishop|queen|king] piece
         this.el.setAttribute("mixin", this.data.color + this.data.type + " piece pickedup-anim");
 
         // set the position and rotation of the piece
@@ -176,7 +180,7 @@ AFRAME.registerComponent("piece", {
     clicked: function (evt) {
         evt.stopPropagation();
         console.log("piece " + this.el.id + " clicked");
-        if(currState.pickedup.id !== undefined) {
+        if (currState.pickedup.id !== undefined) {
             // propagate the click to the parent tile
             this.el.parentEl.emit("click");
         } else {
