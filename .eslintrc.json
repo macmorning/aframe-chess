@@ -6,6 +6,8 @@
         "semi": ["error", "always"],
         "no-cond-assign": ["error", "always"],
         "no-console": "off",
-        "no-undef":"off"
+        "no-undef":"off",
+        "no-unmodified-loop-condition":"off",
+        "no-unreachable":"off"
     }
 }
