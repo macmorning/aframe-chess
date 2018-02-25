@@ -4,11 +4,13 @@
     <script src="https://rawgit.com/ngokevin/aframe/animationbugless/dist/aframe-master.min.js"></script>
     <script src="https://unpkg.com/aframe-animation-component@4.0.0-beta8/dist/aframe-animation-component.min.js"></script>
     <script src="https://unpkg.com/aframe-event-set-component@^4.0.0/dist/aframe-event-set-component.min.js"></script>
+    <script src="https://cdn.rawgit.com/donmccurdy/aframe-physics-system/v3.0.1/dist/aframe-physics-system.min.js"></script>
     <script src="js/components.js"></script>
     <script src="js/chessboard.js"></script>
+    <script src="https://rawgit.com/feiss/aframe-environment-component/master/dist/aframe-environment-component.min.js"></script>
   </head>
   <body>
-      <a-scene stats light="defaultLightsEnabled: false">
+      <a-scene environment="preset: egypt; fog: 0.8" stats light="defaultLightsEnabled: false">
          
         <a-assets>
             <a-mixin id="tile" 
@@ -28,18 +30,18 @@
             <a-asset-item id="queenObj" src="assets/queen.obj"></a-asset-item>
             <a-asset-item id="whiteMtl" src="assets/white.mtl"></a-asset-item>
             <a-asset-item id="blackMtl" src="assets/black.mtl"></a-asset-item>
-            <a-mixin id="blackpawn" obj-model="obj: #pawnObj; mtl: #blackMtl"></a-mixin>
-            <a-mixin id="blackknight" obj-model="obj: #knightObj; mtl: #blackMtl"></a-mixin>
-            <a-mixin id="blackrook" obj-model="obj: #rookObj; mtl: #blackMtl"></a-mixin>
-            <a-mixin id="blackbishop" obj-model="obj: #bishopObj; mtl: #blackMtl"></a-mixin>
-            <a-mixin id="blackking" obj-model="obj: #kingObj; mtl: #blackMtl"></a-mixin>
-            <a-mixin id="blackqueen" obj-model="obj: #queenObj; mtl: #blackMtl"></a-mixin>
-            <a-mixin id="whitepawn" obj-model="obj: #pawnObj; mtl: #whiteMtl"></a-mixin>
-            <a-mixin id="whiteknight" obj-model="obj: #knightObj; mtl: #whiteMtl"></a-mixin>
-            <a-mixin id="whiterook" obj-model="obj: #rookObj; mtl: #whiteMtl"></a-mixin>
-            <a-mixin id="whitebishop" obj-model="obj: #bishopObj; mtl: #whiteMtl"></a-mixin>
-            <a-mixin id="whiteking" obj-model="obj: #kingObj; mtl: #whiteMtl"></a-mixin>
-            <a-mixin id="whitequeen" obj-model="obj: #queenObj; mtl: #whiteMtl"></a-mixin>
+            <a-mixin dynamic-body="shape: box;angularDamping: 0.9" id="blackpawn" obj-model="obj: #pawnObj; mtl: #blackMtl"></a-mixin>
+            <a-mixin dynamic-body="shape: box;angularDamping: 0.9" id="blackknight" obj-model="obj: #knightObj; mtl: #blackMtl"></a-mixin>
+            <a-mixin dynamic-body="shape: box;angularDamping: 0.9" id="blackrook" obj-model="obj: #rookObj; mtl: #blackMtl"></a-mixin>
+            <a-mixin dynamic-body="shape: box;angularDamping: 0.9" id="blackbishop" obj-model="obj: #bishopObj; mtl: #blackMtl"></a-mixin>
+            <a-mixin dynamic-body="shape: box;angularDamping: 0.9" id="blackking" obj-model="obj: #kingObj; mtl: #blackMtl"></a-mixin>
+            <a-mixin dynamic-body="shape: box;angularDamping: 0.9" id="blackqueen" obj-model="obj: #queenObj; mtl: #blackMtl"></a-mixin>
+            <a-mixin dynamic-body="shape: box;angularDamping: 0.9" id="whitepawn" obj-model="obj: #pawnObj; mtl: #whiteMtl"></a-mixin>
+            <a-mixin dynamic-body="shape: box;angularDamping: 0.9" id="whiteknight" obj-model="obj: #knightObj; mtl: #whiteMtl"></a-mixin>
+            <a-mixin dynamic-body="shape: box;angularDamping: 0.9" id="whiterook" obj-model="obj: #rookObj; mtl: #whiteMtl"></a-mixin>
+            <a-mixin dynamic-body="shape: box;angularDamping: 0.9" id="whitebishop" obj-model="obj: #bishopObj; mtl: #whiteMtl"></a-mixin>
+            <a-mixin dynamic-body="shape: box;angularDamping: 0.9" id="whiteking" obj-model="obj: #kingObj; mtl: #whiteMtl"></a-mixin>
+            <a-mixin dynamic-body="shape: box;angularDamping: 0.9" id="whitequeen" obj-model="obj: #queenObj; mtl: #whiteMtl"></a-mixin>
         </a-assets>
 
         <a-sky color="#4c5056"></a-sky>
@@ -50,13 +52,17 @@
           <!-- tiles & pieces will be created and placed at the initialization of the board component -->
         </a-plane>
 
+        <!-- this is our floor -->
+        <a-box width="75" height="0.2" depth="75" static-body visible="false"></a-box>
+
        <!-- Oh and this is the viewer initial position -->
-         <a-entity position="0 0.5 0">
+         <a-entity position="0 1 0">
              <a-camera>
                 <a-cursor geometry="primitive: ring; radiusOuter: 0.05; radiusInner: 0.03" material="color: firebrick"></a-cursor>
              </a-camera>
          </a-entity>
       </a-scene>
+  
       <a href="https://github.com/macmorning/aframe-chess"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
   </body>
 </html>

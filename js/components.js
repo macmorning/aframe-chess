@@ -1,7 +1,3 @@
-const currState = {
-    pickedup: {}
-};
-
 AFRAME.registerComponent("board", {
     schema: {
         chessBoardColumns: {type: "array", default: ["a", "b", "c", "d", "e", "f", "g", "h"]},
@@ -93,38 +89,6 @@ AFRAME.registerComponent("tile", {
     init: function () {
         this.el.setAttribute("mixin", "tile");
         this.el.setAttribute("material", "color: " + this.data.color);
-        var self = this;
-        this.el.addEventListener("click", function (evt) {
-            self.clicked(evt);
-        });
-    },
-    clicked: function (evt) {
-        if (this.el.firstChild && currState.pickedup.id !== undefined) {
-            // a piece was picked up but there is a piece on the target tile
-            if (this.el.firstChild.components.piece.data.color === currState.pickedup.components.piece.data.color) {
-                // the piece on the target tile has the same color as the one that was picked up
-                return false;
-            } else {
-                // remove the other color piece
-                this.el.removeChild(this.el.firstChild);
-            }
-        }
-        if (currState.pickedup.id !== undefined && CHESSBOARD._canMove(currState.pickedup.id, this.el.id)) {
-            // then, move the picked up piece to the tile
-            // check this thread on reparenting: https://github.com/aframevr/aframe/issues/2425
-            var entity = currState.pickedup;
-            entity.flushToDOM(true);
-            let copy = entity.cloneNode();
-            this.el.appendChild(copy);
-            entity.parentNode.removeChild(entity);
-            currState.pickedup = {};
-            copy.emit("dropped");
-        } else if (currState.pickedup.id !== undefined) {
-            console.log(currState.pickedup.id + " cannot move to " + this.el.id);
-        } else if (this.el.firstChild) {
-            // if a piece is on the tile, then propagate the clicked event
-            this.el.firstChild.components.piece.clicked(evt);
-        }
     }
 });
 
@@ -139,7 +103,9 @@ AFRAME.registerComponent("piece", {
         // up position: -0.5
         upPosition: {type: "number", default: -0.5},
         // down position: -0.1
-        downPosition: {type: "number", default: -0.1}
+        downPosition: {type: "number", default: -2},
+        // used by forcePush
+        force: { default: 10 }
     },
     init: function () {
         // set the id of the new element : "bpawnf", "wqueen", ...
@@ -153,47 +119,22 @@ AFRAME.registerComponent("piece", {
         this.el.setAttribute("position", { "x": position.x, "y": position.y, "z": this.data.downPosition });
         this.el.setAttribute("rotation", this.data.initRotationX + " " + this.data.initRotationY + " " + this.data.initRotationZ);
 
-        /******************************
-         *  Setting up animations
-        *******************************/
-        // floating animation
-        let floatfrom = position.x + " " + position.y + " " + this.data.upPosition;
-        let floatto = position.x + " " + position.y + " " + (this.data.upPosition + 0.1);
-        let animationFloating = "property: position; startEvents: pickedup; pauseEvents: dropped; dir: alternate; delay: 500;dur: 1000;easing: easeInSine; loop: true; from:" + floatfrom + "; to:" + floatto;
-        this.el.setAttribute("animation__floating", animationFloating);
-
-        // picked up animation
-        let from = position.x + " " + position.y + " " + position.z;
-        let to = position.x + " " + position.y + " " + this.data.upPosition;
-        let animationPickedup = "property: position; startEvents: pickedup; dur: 500;easing: easeInSine; from:" + from + "; to:" + to;
-        this.el.setAttribute("animation__pickedup", animationPickedup);
-
-        // dropped animation
-        let animationDropped = "property: position; startEvents: dropped; dur: 500;easing: easeInSine; from:" + to + "; to:" + from;
-        this.el.setAttribute("animation__dropped", animationDropped);
-
-        var self = this;
-        this.el.addEventListener("click", function (evt) {
-            self.clicked(evt);
-        });
+        this.pStart = new THREE.Vector3();
+        this.el.addEventListener("click", this.forcePush.bind(this));
     },
-    clicked: function (evt) {
-        evt.stopPropagation();
-        console.log("piece " + this.el.id + " clicked");
-        if (currState.pickedup.id !== undefined) {
-            // propagate the click to the parent tile
-            this.el.parentEl.emit("click");
-        } else {
-            let position = this.el.getAttribute("position");
-            if (position.z < this.data.downPosition) {
-                // warning: sometimes after animating the position, the entity is not exactly at the expected "to" position (-0.09999999998 instead of -0.1)
-                this.el.emit("dropped");
-            } else {
-                // start the pickedup animation
-                this.el.emit("pickedup");
-                currState.pickedup = this.el;
-            }
-        }
+    forcePush: function () {
+        console.log("force pushing " + this.el.id);
+        let force;
+        let el = this.el;
+        this.sourceEl = this.el.sceneEl.querySelector("[camera]");
+        let pStart = this.pStart.copy(this.sourceEl.getAttribute("position"));
+
+        // Compute direction of force, normalize, then scale.
+        force = el.body.position.vsub(pStart);
+        force.normalize();
+        force.scale(this.data.force, force);
+
+        el.body.applyImpulse(force, el.body.position);
     },
     update: function () {
     },
@@ -202,7 +143,7 @@ AFRAME.registerComponent("piece", {
         tempSchema.initRotationY = {type: "number", default: 0};
         // if piece is white then flip it
         if (data.color === "white") {
-            tempSchema.initRotationX = {type: "number", default: 90};
+            tempSchema.initRotationX = {type: "number", default: -90};
             tempSchema.initRotationZ = {type: "number", default: 180};
         } else {
             tempSchema.initRotationX = {type: "number", default: -90};
