@@ -49,7 +49,7 @@
         <a-entity light="type: point; color: white; intensity: 1" position="-4 7 -5"></a-entity> 
         <a-entity light="type: ambient; color: white; intensity: 0.4"></a-entity> 
         <!-- Board container - all positions will be relative to the ones of the container so we can move the board around later -->
-        <a-plane board color="black" id="boardContainer" width="8" height="8">
+        <a-plane board color="black" id="boardContainer" rotation="90 0 0" width="8" height="8" position="-4 0 -10">
           <!-- tiles & pieces will be created and placed at the initialization of the board component -->
         </a-plane>
 
